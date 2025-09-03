@@ -3,7 +3,11 @@ import Joi from "joi";
 // Define validation schema
 export const createUserSchema = Joi.object({
   name: Joi.string().min(2).max(50).required(),
-  email: Joi.string().email().required(),
+  email: Joi.string().email().required().messages({
+    "string.email": "Email must be a valid email",
+    "string.empty": "Email is required",
+  }),
+
   password: Joi.string()
     .pattern(
       new RegExp(
@@ -26,4 +30,17 @@ export const createUserSchema = Joi.object({
     .optional(),
   isActive: Joi.boolean().optional(),
   isVerified: Joi.boolean().optional(),
+});
+
+export const loginValidation = Joi.object({
+  email: Joi.string().email().required().messages({
+    "string.empty": "Email is required",
+    "string.email": "Please enter a valid email address",
+    "any.required": "Email is required",
+  }),
+  password: Joi.string().min(8).required().messages({
+    "string.empty": "Password is required",
+    "string.min": "Password must be at least 8 characters long",
+    "any.required": "Password is required",
+  }),
 });

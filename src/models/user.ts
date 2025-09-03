@@ -1,8 +1,9 @@
 // user.ts
+import bcrypt from "bcryptjs";
 import { Document, Model, model, Schema } from "mongoose";
 
-// 1. Define a TypeScript interface for the User
 export interface IUser extends Document {
+  _id: string;
   name: string;
   email: string;
   password: string;
@@ -16,6 +17,9 @@ export interface IUser extends Document {
   isVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
+
+  // instance methods
+  isPasswordMatched(enteredPassword: string): Promise<boolean>;
 }
 
 // 2. Create the Mongoose schema
@@ -38,6 +42,7 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
     password: {
       type: String,
       required: [true, "Password is required"],
+      select: false,
       minlength: 6,
     },
     gender: {
@@ -62,7 +67,7 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
     },
     isActive: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     isVerified: {
       type: Boolean,
@@ -78,6 +83,21 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
     timestamps: true,
   }
 );
+
+//hashed Password
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  const salt = await bcrypt.genSalt(12);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+// Compare password method
+userSchema.methods.isPasswordMatched = async function (
+  enteredPassword: string
+): Promise<boolean> {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
 
 // 3. Create and export the model
 export const User: Model<IUser> = model<IUser>("User", userSchema);
