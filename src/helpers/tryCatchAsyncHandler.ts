@@ -1,14 +1,13 @@
-// tryCatchAsyncHandler.ts
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import { NextFunction, RequestHandler, Response } from "express";
 
-type AsyncHandler = (
-  req: Request,
+type AsyncHandler<Req = any> = (
+  req: Req,
   res: Response,
   next: NextFunction
 ) => Promise<any>;
 
 export const tryCatchAsyncHandler =
-  (theFunc: AsyncHandler): RequestHandler =>
-  (req: Request, res: Response, next: NextFunction): void => {
-    Promise.resolve(theFunc(req, res, next)).catch(next);
+  <Req = any>(theFunc: AsyncHandler<Req>): RequestHandler =>
+  (req, res, next) => {
+    Promise.resolve(theFunc(req as Req, res, next)).catch(next);
   };

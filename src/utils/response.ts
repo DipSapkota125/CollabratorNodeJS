@@ -5,18 +5,16 @@ interface Tokens {
   accessToken: string;
   refreshToken: string;
 }
-
-// Update SendResponseOptions to allow object token
 interface SendResponseOptions<T = any> {
   success: boolean;
   message: string;
-  data?: T;
-  token?: string | Tokens | null; // allow object
+  data?: T | null; // allow null
+  token?: string | Tokens | null;
   statusCode?: number;
+  meta?: any; // allow meta
 }
 
 // sendResponse utility
-
 export const sendResponse = <T>(
   res: ExpressResponse,
   {
@@ -30,9 +28,9 @@ export const sendResponse = <T>(
 ) => {
   const response: Record<string, any> = { success, message };
 
-  if (data) response.data = data;
+  if (data !== null) response.data = data;
   if (token) response.token = token;
-  if (meta) response.meta = meta;
+  if (meta !== null) response.meta = meta;
 
   return res.status(statusCode).json(response);
 };

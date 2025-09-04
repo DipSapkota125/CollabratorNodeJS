@@ -1,5 +1,6 @@
 import { tryCatchAsyncHandler } from "../helpers/tryCatchAsyncHandler";
 import { User } from "../models/user";
+import { AuthenticatedRequest } from "../types/express";
 import ErrorHandler from "../utils/errorHandler";
 import { sendResponse } from "../utils/response";
 import { generateTokens } from "../utils/tokenUtils";
@@ -103,3 +104,18 @@ export const logout = tryCatchAsyncHandler(async (req, res, next) => {
     statusCode: 200,
   });
 });
+
+//get profile
+export const getUserProfile = tryCatchAsyncHandler<AuthenticatedRequest>(
+  async (req, res, next) => {
+    const user = await User.findById(req.user.id);
+    if (!user) return next(new ErrorHandler("Resource Not Found!", 404));
+
+    sendResponse(res, {
+      success: true,
+      message: "User profile fetched successfully",
+      data: user,
+      statusCode: 200,
+    });
+  }
+);
