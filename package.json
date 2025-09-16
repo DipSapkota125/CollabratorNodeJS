@@ -18,6 +18,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/mongo-sanitize": "^1.0.3",
     "@types/morgan": "^1.9.10",
+    "@types/multer": "^2.0.0",
     "@types/node": "^24.3.0",
     "@types/sanitize-html": "^2.16.0",
     "i": "^0.3.7",
@@ -27,6 +28,7 @@
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.7.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
@@ -38,6 +40,8 @@
     "mongo-sanitize": "^1.1.0",
     "mongoose": "^8.18.0",
     "morgan": "^1.10.1",
+    "multer": "^2.0.2",
+    "nodemailer": "^7.0.6",
     "sanitize-html": "^2.17.0"
   }
 }

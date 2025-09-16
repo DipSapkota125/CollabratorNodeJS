@@ -72,7 +72,7 @@ export const login = tryCatchAsyncHandler(async (req, res, next) => {
 
   sendResponse(res, {
     success: true,
-    message: "Login successful",
+    message: "Login Successful",
     data: {
       _id: user._id,
       name: user.name,
