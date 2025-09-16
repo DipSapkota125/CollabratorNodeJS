@@ -47,7 +47,7 @@ export const login = tryCatchAsyncHandler(async (req, res, next) => {
 
   const isPasswordMatched = await user.isPasswordMatched(password);
   if (!isPasswordMatched) {
-    return next(new ErrorHandler("Invalid credentials!", 400));
+    return next(new ErrorHandler("Invalid Credentials!", 400));
   }
 
   // 4. Generate tokens
@@ -74,7 +74,7 @@ export const login = tryCatchAsyncHandler(async (req, res, next) => {
     success: true,
     message: "Login successful",
     data: {
-      id: user._id,
+      _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
