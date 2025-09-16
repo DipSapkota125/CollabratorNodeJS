@@ -9,7 +9,10 @@ export interface IUser extends Document {
   password: string;
   role?: "user" | "admin";
   address?: string;
-  avatar?: string;
+  avatar?: {
+    public_id: string;
+    secure_url: string;
+  };
   mobile?: string;
   gender?: string;
   date_of_birth?: string;
@@ -59,8 +62,10 @@ const userSchema: Schema<IUser> = new Schema<IUser>(
       trim: true,
     },
     avatar: {
-      type: String,
+      public_id: { type: String },
+      secure_url: { type: String },
     },
+
     mobile: {
       type: String,
       trim: true,

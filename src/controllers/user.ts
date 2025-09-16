@@ -1,6 +1,9 @@
+import cloudinary from "cloudinary";
+import sharp from "sharp";
 import { tryCatchAsyncHandler } from "../helpers/tryCatchAsyncHandler";
 import { User } from "../models/user";
 import { AuthenticatedRequest } from "../types/express";
+import { avatarStreamUpload } from "../uploads/fileConverter";
 import ErrorHandler from "../utils/errorHandler";
 import { sendResponse } from "../utils/response";
 import { generateTokens } from "../utils/tokenUtils";
@@ -119,3 +122,79 @@ export const getUserProfile = tryCatchAsyncHandler<AuthenticatedRequest>(
     });
   }
 );
+
+//update Profile
+
+export const updateProfile = tryCatchAsyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+  if (!user) return next(new ErrorHandler("Resource Not Found!", 404));
+
+  const { name, gender, date_of_birth, address } = req.body;
+
+  const updatedData: Record<string, any> = {
+    ...(name && { name }),
+    ...(gender && { gender }),
+    ...(date_of_birth && { date_of_birth }),
+    ...(address && { address }),
+  };
+
+  // ✅ Handle Cloudinary update if new file is uploaded
+  if (req.file) {
+    try {
+      // Convert uploaded image buffer to optimized WebP
+      const webpBuffer = await sharp(req.file.buffer)
+        .webp({ quality: 80 })
+        .toBuffer();
+
+      // Upload to Cloudinary
+      const result = await avatarStreamUpload(webpBuffer);
+
+      // Add new avatar
+      updatedData.avatar = {
+        secure_url: result.secure_url,
+        public_id: result.public_id,
+      };
+
+      // Delete old avatar if exists
+      if (user.avatar?.public_id) {
+        await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+      }
+    } catch (error) {
+      return next(new ErrorHandler("Error updating avatar image.", 500));
+    }
+  }
+
+  // Update user with new data
+  const updatedUser = await User.findByIdAndUpdate(user._id, updatedData, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!updatedUser) {
+    return next(new ErrorHandler("User update failed!", 500));
+  }
+
+  sendResponse(res, {
+    success: true,
+    message: "Profile updated successfully",
+    data: {
+      id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      mobile: updatedUser.mobile,
+      gender: updatedUser.gender,
+      date_of_birth: updatedUser.date_of_birth,
+      address: updatedUser.address,
+      avatar: updatedUser.avatar
+        ? {
+            public_id: updatedUser.avatar.public_id,
+            secure_url: updatedUser.avatar.secure_url,
+          }
+        : null,
+      role: updatedUser.role,
+    },
+    statusCode: 200,
+  });
+});
+
+//change Password

@@ -20,9 +20,16 @@ export const createUserSchema = Joi.object({
         "Password must be at least 8 characters long, include uppercase, lowercase, number, and special character",
       "string.empty": "Password is required",
     }),
+
   role: Joi.string().valid("user", "admin").optional(),
   address: Joi.string().max(200).optional(),
-  avatar: Joi.string().uri().optional(),
+
+  // avatar object with public_id + secure_url
+  avatar: Joi.object({
+    public_id: Joi.string().optional(),
+    secure_url: Joi.string().uri().optional(),
+  }).optional(),
+
   gender: Joi.string().valid("male", "female", "other").optional(),
   date_of_birth: Joi.date().optional(),
   mobile: Joi.string()

@@ -3,9 +3,11 @@ import {
   getUserProfile,
   login,
   logout,
+  updateProfile,
   userRegister,
 } from "../controllers/user";
 import { isAuthenticated } from "../middlewares/auth";
+import { singleAvatar } from "../uploads/multer";
 
 const router = express.Router();
 
@@ -18,5 +20,8 @@ router.post("/logout", logout);
 
 //get Profile
 router.get("/profile", isAuthenticated, getUserProfile);
+
+//update profile
+router.put("/update-profile", isAuthenticated, singleAvatar, updateProfile);
 
 export default router;
