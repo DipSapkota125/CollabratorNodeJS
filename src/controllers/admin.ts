@@ -105,3 +105,36 @@ export const deleteUsers = tryCatchAsyncHandler(async (req, res, next) => {
     statusCode: 200,
   });
 });
+
+// update role and isActive for multiple users at once
+export const multipleUpdateRoleIsActive = tryCatchAsyncHandler(
+  async (req, res, next) => {
+    const { ids, role, isActive } = req.body;
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      return next(new ErrorHandler("Please provide at least one user id", 400));
+    }
+
+    if (typeof role === "undefined" && typeof isActive === "undefined") {
+      return next(
+        new ErrorHandler("Please provide role or isActive to update", 400)
+      );
+    }
+
+    // Prepare update object
+    const updateData: Record<string, any> = {};
+    if (role) updateData.role = role;
+    if (typeof isActive !== "undefined") updateData.isActive = isActive;
+
+    // Bulk update
+    const result = await User.updateMany(
+      { _id: { $in: ids } },
+      { $set: updateData }
+    );
+
+    sendResponse(res, {
+      success: true,
+      message: `${result.modifiedCount} user(s) updated successfully`,
+      statusCode: 200,
+    });
+  }
+);

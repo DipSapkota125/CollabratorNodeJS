@@ -3,6 +3,7 @@ import {
   allUsers,
   deleteUsers,
   manageRolePermission,
+  multipleUpdateRoleIsActive,
   viewUserDetails,
 } from "../controllers/admin";
 import { isAuthAdmin, isAuthenticated } from "../middlewares/auth";
@@ -29,5 +30,12 @@ router.get(
 
 //delete-users
 router.delete("/delete-users", isAuthenticated, isAuthAdmin, deleteUsers);
+//update-multiple
+router.put(
+  "/users/multiple-update",
+  isAuthenticated,
+  isAuthAdmin,
+  multipleUpdateRoleIsActive
+);
 
 export default router;
