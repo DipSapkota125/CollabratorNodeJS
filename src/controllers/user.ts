@@ -124,7 +124,6 @@ export const getUserProfile = tryCatchAsyncHandler<AuthenticatedRequest>(
 );
 
 //update Profile
-
 export const updateProfile = tryCatchAsyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   if (!user) return next(new ErrorHandler("Resource Not Found!", 404));
@@ -198,3 +197,56 @@ export const updateProfile = tryCatchAsyncHandler(async (req, res, next) => {
 });
 
 //change Password
+export const changePassword = tryCatchAsyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select("+password");
+  if (!user) return next(new ErrorHandler("Resource Not Found!", 404));
+
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+  if (!oldPassword || !newPassword || !confirmPassword) {
+    return next(new ErrorHandler("please enter all fields", 400));
+  }
+
+  if (newPassword !== confirmPassword) {
+    return next(new ErrorHandler("password must be match", 400));
+  }
+
+  const isMatched = await user.isPasswordMatched(oldPassword);
+  if (!isMatched) {
+    return next(new ErrorHandler("olPassword is incorrect", 400));
+  }
+
+  user.password = newPassword;
+  await user.save();
+  sendResponse(res, {
+    success: true,
+    message: "Password updated successFully!",
+    statusCode: 200,
+  });
+});
+
+// update Role By admin Only
+export const manageRolePermission = tryCatchAsyncHandler(
+  async (req, res, next) => {
+    const { id } = req.params;
+    const user = await User.findById(id);
+
+    if (!user) {
+      return next(new ErrorHandler("User not found", 404));
+    }
+
+    const { email, mobile, role, isActive } = req.body;
+
+    if (email) user.email = email;
+    if (mobile) user.mobile = mobile;
+    if (role) user.role = role;
+    if (typeof isActive !== "undefined") user.isActive = isActive;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "User role/permission updated successfully",
+      user,
+    });
+  }
+);

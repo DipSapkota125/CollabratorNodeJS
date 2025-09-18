@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  changePassword,
   getUserProfile,
   login,
   logout,
@@ -23,5 +24,7 @@ router.get("/profile", isAuthenticated, getUserProfile);
 
 //update profile
 router.put("/update-profile", isAuthenticated, singleAvatar, updateProfile);
+//change password
+router.put("/change-password", isAuthenticated, changePassword);
 
 export default router;

@@ -3,6 +3,7 @@ import { tryCatchAsyncHandler } from "../helpers/tryCatchAsyncHandler";
 import { User } from "../models/user";
 import ErrorHandler from "../utils/errorHandler";
 
+//for all
 export const isAuthenticated = tryCatchAsyncHandler(async (req, res, next) => {
   const token =
     req.cookies.accessToken || req.headers.authorization?.split(" ")[1];
@@ -42,4 +43,21 @@ export const isAuthenticated = tryCatchAsyncHandler(async (req, res, next) => {
 
     return next(new ErrorHandler("Invalid token. Please log in again.", 401));
   }
+});
+
+//for admin
+export const isAuthAdmin = tryCatchAsyncHandler(async (req, res, next) => {
+  if (!req.user) {
+    return next(
+      new ErrorHandler("you must be authenticated to access this resource", 401)
+    );
+  }
+  if (req.user.role !== "admin")
+    return next(
+      new ErrorHandler(
+        `${req.user.role} is not authorize to access this resource!`,
+        403
+      )
+    );
+  next();
 });
