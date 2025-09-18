@@ -87,6 +87,7 @@ export const login = tryCatchAsyncHandler(async (req, res, next) => {
   });
 });
 
+//logout
 export const logout = tryCatchAsyncHandler(async (req, res, next) => {
   res.clearCookie("accessToken", {
     httpOnly: true,
@@ -223,30 +224,3 @@ export const changePassword = tryCatchAsyncHandler(async (req, res, next) => {
     statusCode: 200,
   });
 });
-
-// update Role By admin Only
-export const manageRolePermission = tryCatchAsyncHandler(
-  async (req, res, next) => {
-    const { id } = req.params;
-    const user = await User.findById(id);
-
-    if (!user) {
-      return next(new ErrorHandler("User not found", 404));
-    }
-
-    const { email, mobile, role, isActive } = req.body;
-
-    if (email) user.email = email;
-    if (mobile) user.mobile = mobile;
-    if (role) user.role = role;
-    if (typeof isActive !== "undefined") user.isActive = isActive;
-
-    await user.save();
-
-    res.status(200).json({
-      success: true,
-      message: "User role/permission updated successfully",
-      user,
-    });
-  }
-);
