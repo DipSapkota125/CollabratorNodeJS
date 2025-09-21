@@ -8,6 +8,7 @@ import { errorListening } from "./helpers/error";
 import { generalLimiter } from "./helpers/rateLimiter";
 import { sanitizeInput } from "./helpers/sanitize";
 import adminRoutes from "./routes/admin";
+import sliderRoutes from "./routes/slider";
 import userRoutes from "./routes/user";
 
 const app = express();
@@ -25,6 +26,7 @@ app.use(cors(corsOptions));
 //routing
 app.use("/api/v1", userRoutes);
 app.use("/api/v1", adminRoutes);
+app.use("/api/v1", sliderRoutes);
 
 app.get("/", (req, res) => {
   res.send("✅ Server is running securely!");
